@@ -1,8 +1,28 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { toggleMenu } from "../utils/appSlice";
+import { useState } from "react";
+import { YOUTUBE_SEARCH_API } from "../utils/contants";
+
 
 const Head = () => {
+
+  const [ searchQuery , setSearchQuery ] = useState("");
+
+  useEffect(()=>{
+    const timer = setTimeout(()=> getSearchSuggection(),200);
+    return () => {
+      clearTimeout(timer);
+    };
+    // console.log(searchQuery);
+  },[searchQuery]);
+
+  const getSearchSuggection = async () => {
+    const data = await fetch(YOUTUBE_SEARCH_API + searchQuery);
+    const json = await data.json();
+    console.log(json);
+  }
+
   const dispatch = useDispatch();
 
   const toggleMenuHandler = () => {
@@ -34,6 +54,8 @@ const Head = () => {
         <input
           className="w-1/2 px-4 border-2 border-gray-600 rounded-l-full"
           type="text"
+          value = {searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
         />
         <button className="border-2 border-gray-600 p-2 rounded-r-full bg-slate-200">
           🔍
