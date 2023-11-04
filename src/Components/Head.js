@@ -4,24 +4,25 @@ import { toggleMenu } from "../utils/appSlice";
 import { useState } from "react";
 import { YOUTUBE_SEARCH_API } from "../utils/contants";
 
-
 const Head = () => {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [suggestion, setSuggestion] = useState([]);
+  const [showSuggestion, setShowSuggestion] = useState(false);
 
-  const [ searchQuery , setSearchQuery ] = useState("");
-
-  useEffect(()=>{
-    const timer = setTimeout(()=> getSearchSuggection(),200);
+  useEffect(() => {
+    const timer = setTimeout(() => getSearchSuggection(), 200);
     return () => {
       clearTimeout(timer);
     };
     // console.log(searchQuery);
-  },[searchQuery]);
+  }, [searchQuery]);
 
   const getSearchSuggection = async () => {
     const data = await fetch(YOUTUBE_SEARCH_API + searchQuery);
     const json = await data.json();
-    console.log(json);
-  }
+    setSuggestion(json[1]);
+    //console.log(json);
+  };
 
   const dispatch = useDispatch();
 
@@ -30,12 +31,11 @@ const Head = () => {
   };
 
   return (
-    <div className="grid grid-flow-col p-4 m-2 shadow-lg">
+    <div className="grid grid-flow-col p-4 m-2 shadow-lg ">
       <div className="flex col-span-1">
         <img
-         alt="side-bar"
+          alt="side-bar"
           onClick={() => {
-           
             toggleMenuHandler();
           }}
           className="h-10 cursor-pointer"
@@ -50,16 +50,32 @@ const Head = () => {
           />
         </a>
       </div>
-      <div className="flex col-span-10 ">
-        <input
-          className="w-1/2 px-4 border-2 border-gray-600 rounded-l-full"
-          type="text"
-          value = {searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-        />
-        <button className="border-2 border-gray-600 p-2 rounded-r-full bg-slate-200">
-          🔍
-        </button>
+      <div className="col-span-10">
+        <div>
+          <input
+            className="w-1/2 h-10 px-4 border-2 border-gray-600 rounded-l-full"
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            onFocus={() => setShowSuggestion(true)}
+            onBlur={() => setShowSuggestion(false)}
+          />
+          <button className="h-10 border-2 border-gray-600 p-2 rounded-r-full bg-slate-200">
+            Search
+          </button>
+        </div>
+
+        {showSuggestion && (
+          <div className="px-4  fixed bg-white w-[34rem] rounded-lg absolute">
+            <ul className="">
+              {suggestion.map((s) => (
+                <li key={s} className=" hover:bg-gray-200 p-1 border-b-2 border-b-gray-200 ">
+                  🔍 {s}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
       </div>
       <div className="col-span-1">
         <img
