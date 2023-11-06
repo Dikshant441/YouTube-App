@@ -5,7 +5,7 @@ import { addMessage } from "../utils/chatSlice";
 import { generateRandomMessages, generateRandomNames } from "../utils/helper";
 
 const LiveChat = () => {
-  const [liveMessgae, setLiveMessage] = useState("");
+  const [liveMessage, setLiveMessage] = useState("");
   const dispatch = useDispatch();
 
   const chatMessages = useSelector((store) => store.chat.messages);
@@ -13,14 +13,14 @@ const LiveChat = () => {
   useEffect(() => {
     const i = setInterval(() => {
       //API CALLING
-      console.log("API caliing");
+    //   console.log("API caliing");
       dispatch(
         addMessage({
           name: generateRandomNames(),
           message: generateRandomMessages(20) + " 🚀",
         })
       );
-    }, 500);
+    }, 1500);
 
     return () => clearInterval(i);
   }, []);
@@ -39,15 +39,21 @@ const LiveChat = () => {
         className="w-full mx-3 my-2 p-2 border border-black"
         onSubmit={(e) => {
           e.preventDefault();
-          console.log("on form submit");
+          //   console.log("on form submit" , liveMessage);
+          dispatch(
+            addMessage({
+              name: "Dikshant",
+              message: liveMessage,
+            })
+          );
         }}
       >
         <input
           className="w-3/4 p-1 border border-black"
           type="text"
-          vlaue={liveMessgae}
-          onClick={(e) => {
-            setLiveMessage(e.target.vlaue);
+          value={liveMessage}
+          onChange={(e) => {
+            setLiveMessage(e.target.value);
           }}
         />
         <button className="w-20 mx-4 bg-green-100">send</button>
