@@ -1,16 +1,28 @@
 import React, { useEffect } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { toggleMenu } from "../utils/appSlice";
 import { useState } from "react";
 import { YOUTUBE_SEARCH_API } from "../utils/contants";
+import { cacheResults } from "../utils/searchSlice";
+
 
 const Head = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [suggestion, setSuggestion] = useState([]);
   const [showSuggestion, setShowSuggestion] = useState(false);
+ const dispatch = useDispatch();
+  const searchcache = useSelector((store)=>store.search);
+ 
 
   useEffect(() => {
-    const timer = setTimeout(() => getSearchSuggection(), 200);
+    const timer = setTimeout(() =>{
+      if(searchcache[searchQuery]){
+        setSuggestion(searchcache[searchQuery]);
+      }else{
+        getSearchSuggection();
+      }
+    } , 200);
+
     return () => {
       clearTimeout(timer);
     };
@@ -22,9 +34,15 @@ const Head = () => {
     const json = await data.json();
     setSuggestion(json[1]);
     //console.log(json);
+
+    dispatch(
+      cacheResults({
+        [searchQuery]: json[1],
+      })
+    );
   };
 
-  const dispatch = useDispatch();
+
 
   const toggleMenuHandler = () => {
     dispatch(toggleMenu());
@@ -66,7 +84,7 @@ const Head = () => {
         </div>
 
         {showSuggestion && (
-          <div className="px-4  fixed bg-white w-[34rem] rounded-lg absolute">
+          <div className="px-4 bg-white w-[34rem] rounded-lg absolute">
             <ul className="">
               {suggestion.map((s) => (
                 <li key={s} className=" hover:bg-gray-200 p-1 border-b-2 border-b-gray-200 ">
